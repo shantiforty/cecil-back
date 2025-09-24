@@ -1,18 +1,23 @@
+// src/index.ts
+
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { query } from "./db";
-import membershipRoutes from "./router/membership";
 import loginRoutes from "./router/login";
+import membershipRoutes from "./router/membership"; // ⬅️ import it
+import membershipLogsRoutes from "./router/membershipLogs";
+
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-
-
 app.use("/login", loginRoutes);
+app.use("/membership", membershipRoutes); // ⬅️ mount it here
+app.use("/logs", membershipLogsRoutes);
 
 
 app.get("/members", async (_req, res) => {
@@ -36,14 +41,11 @@ app.get("/members/:id", async (req, res) => {
       return res.status(404).json({ error: "Member not found" });
     }
 
-    res.json(result.recordset[0]); 
+    res.json(result.recordset[0]);
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
 });
-
-app.use("/membership", membershipRoutes);
-
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
